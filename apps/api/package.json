@@ -1,0 +1,35 @@
+{
+  "name": "@support/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsc-watch -p tsconfig.json --onSuccess \"node --env-file=../../.env dist/src/main.js\"",
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file=../../.env dist/src/main.js",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "test:db": "node --env-file=../../.env --test dist/test/database.integration.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.0",
+    "@nestjs/core": "^11.1.0",
+    "@nestjs/platform-express": "^11.1.0",
+    "@nestjs/throttler": "^6.4.0",
+    "@support/contracts": "0.1.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "helmet": "^8.1.0",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsc-watch": "^7.2.0"
+  }
+}
