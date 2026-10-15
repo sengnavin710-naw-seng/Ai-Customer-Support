@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node --env-file=../../.env dist/src/main.js",
     "test": "npm run build && node --test dist/test/*.test.js",
-    "test:db": "node --env-file=../../.env --test dist/test/database.integration.js"
+    "test:db": "node --env-file=../../.env --test dist/test/*.integration.js",
+    "db:migrate": "node --env-file=../../.env dist/src/database/migrate.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",

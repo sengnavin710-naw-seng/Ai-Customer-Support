@@ -20,7 +20,8 @@
     "db:down": "docker compose down",
     "check": "npm run lint && npm run build && npm test",
     "test:db": "npm run build -w @support/contracts && npm run build -w @support/api && npm run test:db -w @support/api",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:migrate": "npm run build -w @support/contracts && npm run build -w @support/api && npm run db:migrate -w @support/api"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

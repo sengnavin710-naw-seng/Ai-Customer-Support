@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../App';
-import { api, ApiError } from '../api';
+import { api, ApiError, knowledgeApi } from '../api';
 import { preview } from '../sample';
 import type { Session } from '@support/contracts';
 vi.mock('../api', async (importOriginal) => {
@@ -11,6 +11,7 @@ vi.mock('../api', async (importOriginal) => {
   return {
     ...actual,
     api: { health: vi.fn(), login: vi.fn(), logout: vi.fn(), dashboard: vi.fn() },
+    knowledgeApi: { ...actual.knowledgeApi, articles: vi.fn() },
   };
 });
 const session: Session = {
@@ -43,8 +44,27 @@ beforeEach(() => {
   vi.mocked(api.login).mockResolvedValue(session);
   vi.mocked(api.dashboard).mockResolvedValue(preview);
   vi.mocked(api.logout).mockResolvedValue(undefined);
+  vi.mocked(knowledgeApi.articles).mockResolvedValue({ items: [], total: 0, page: 1, limit: 10 });
 });
 describe('Workspace', () => {
+  it.each(['Sign in to Admin Workspace', 'Sign in to manage knowledge'])(
+    'leaves preview through %s and preserves the Knowledge Base destination after login',
+    async (action) => {
+      const user = mount();
+      await user.click(screen.getByRole('button', { name: /Explore sample workspace/ }));
+      await user.click(screen.getByRole('link', { name: 'Knowledge Base' }));
+      expect(knowledgeApi.articles).not.toHaveBeenCalled();
+      await user.click(screen.getByRole('button', { name: action }));
+      expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+      expect(knowledgeApi.articles).not.toHaveBeenCalled();
+      await user.type(screen.getByLabelText('Email address'), 'admin@example.test');
+      await user.type(screen.getByLabelText('Password'), 'synthetic-test-password');
+      await user.click(screen.getByRole('button', { name: /^Sign in$/ }));
+      expect(await screen.findByRole('button', { name: /New article/ })).toBeInTheDocument();
+      expect(knowledgeApi.articles).toHaveBeenCalledWith(session.accessToken, expect.any(String));
+      expect(api.dashboard).not.toHaveBeenCalled();
+    },
+  );
   it('starts with sign in and provides a labeled public synthetic preview', async () => {
     const user = mount();
     expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();

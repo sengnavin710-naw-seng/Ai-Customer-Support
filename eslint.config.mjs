@@ -7,6 +7,13 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   { languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   {
+    files: ['apps/api/**/*.ts'],
+    // Read emitDecoratorMetadata so DTO classes remain runtime imports for Nest validation.
+    languageOptions: {
+      parserOptions: { project: './apps/api/tsconfig.json', tsconfigRootDir: import.meta.dirname },
+    },
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       '@typescript-eslint/consistent-type-imports': [

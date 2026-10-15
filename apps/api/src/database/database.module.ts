@@ -1,6 +1,7 @@
 import { Inject, Injectable, Module } from '@nestjs/common';
 import type { OnApplicationShutdown } from '@nestjs/common';
 import { Pool } from 'pg';
+import type { PoolClient } from 'pg';
 import { ENV } from '../config';
 import type { Environment } from '../config';
 @Injectable()
@@ -23,6 +24,21 @@ export class DatabaseService implements OnApplicationShutdown {
       return true;
     } catch {
       return false;
+    }
+  }
+  async transaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query("SET LOCAL lock_timeout = '1500ms'");
+      const result = await work(client);
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
   }
   async onApplicationShutdown(): Promise<void> {

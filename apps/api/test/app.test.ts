@@ -111,7 +111,7 @@ describe('Milestone 1 API integration', () => {
   it('rejects oversized JSON requests', async () => {
     await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: 'x'.repeat(20_000) })
+      .send({ email: 'x'.repeat(70_000) })
       .expect(413);
   });
   it('rejects malformed JSON without reflecting its contents', async () => {

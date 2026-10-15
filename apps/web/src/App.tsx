@@ -31,6 +31,7 @@ import type { LucideIcon } from 'lucide-react';
 import type { Dashboard, Session } from '@support/contracts';
 import { api, ApiError } from './api';
 import { preview } from './sample';
+import { KnowledgeBase } from './knowledge-base/KnowledgeBase';
 
 const navigation: { path: string; title: string; icon: LucideIcon }[] = [
   { path: '/', title: 'Overview', icon: LayoutDashboard },
@@ -80,6 +81,7 @@ export function App() {
     <Workspace
       session={session}
       onExpired={expire}
+      onSignIn={() => setPreview(false)}
       onExit={async () => {
         if (session) await api.logout(session.accessToken);
         setSession(null);
@@ -215,10 +217,12 @@ function Workspace({
   session,
   onExit,
   onExpired,
+  onSignIn,
 }: {
   session: Session | null;
   onExit: () => Promise<void>;
   onExpired: () => void;
+  onSignIn: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [health, setHealth] = useState<'checking' | 'online' | 'offline'>('checking');
@@ -359,7 +363,13 @@ function Workspace({
               {session ? 'Development workspace' : 'You’re exploring a sample workspace'}
               <span className="notice-detail">All conversations and metrics are synthetic.</span>
             </span>
-            <span className="milestone-label">MILESTONE 01</span>
+            {session ? (
+              <span className="milestone-label">MILESTONE 02 · PHASE 1</span>
+            ) : (
+              <button className="button secondary" onClick={onSignIn}>
+                Sign in to Admin Workspace
+              </button>
+            )}
           </div>
           {error && (
             <p className="error" role="alert">
@@ -368,8 +378,14 @@ function Workspace({
           )}
           <Routes>
             <Route path="/" element={<Overview session={session} onExpired={onExpired} />} />
+            <Route
+              path="/knowledge-base"
+              element={
+                <KnowledgeBase session={session} onExpired={onExpired} onSignIn={onSignIn} />
+              }
+            />
             {navigation
-              .filter((item) => item.path !== '/')
+              .filter((item) => item.path !== '/' && item.path !== '/knowledge-base')
               .map((item) => (
                 <Route
                   key={item.path}

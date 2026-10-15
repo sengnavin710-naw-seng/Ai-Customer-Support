@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { HealthModule } from './health/health.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { KnowledgeModule } from './knowledge-base/knowledge.module';
 @Global()
 @Module({
   providers: [{ provide: ENV, useFactory: () => loadEnvironment(process.env) }],
@@ -19,6 +20,7 @@ class EnvironmentModule {}
     AuthModule,
     HealthModule,
     DashboardModule,
+    KnowledgeModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
